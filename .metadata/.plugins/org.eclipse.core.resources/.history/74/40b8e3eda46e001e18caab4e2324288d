@@ -1,0 +1,51 @@
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+@RestController
+public class GithubController {
+    
+    @GetMapping("/api/github-repo")
+    public ResponseEntity<GitHubRepository> searchGithubRepo(@RequestParam String username) {
+        // URL de la API de GitHub para buscar repositorios del usuario
+        String githubApiUrl = "https://api.github.com/users/" + username + "/repos";
+
+        // Inicializa RestTemplate
+        RestTemplate restTemplate = new RestTemplate();
+
+        try {
+            // Realiza una solicitud GET a la API de GitHub para obtener la lista de repositorios
+            GitHubRepository[] response = restTemplate.getForObject(githubApiUrl, GitHubRepository[].class);
+
+            if (response != null && response.length > 0) {
+                GitHubRepository firstRepo = response[0];
+
+                String repoName = firstRepo.getName();
+                String repoDetailsUrl = "https://api.github.com/repos/" + username + "/" + repoName;
+                GitHubRepository detailedRepo = restTemplate.getForObject(repoDetailsUrl, GitHubRepository.class);
+
+                if (detailedRepo != null && detailedRepo.getCreated_at() != null) {
+                    return ResponseEntity.ok(detailedRepo);
+                } else {
+                    // Si no se pudo obtener la fecha, devuelve el primer repositorio sin fecha
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    objectMapper.registerModule(new JavaTimeModule());
+                    String firstRepoJson = objectMapper.writeValueAsString(firstRepo);
+                    GitHubRepository firstRepoWithFormattedDate = objectMapper.readValue(firstRepoJson, GitHubRepository.class);
+                    return ResponseEntity.ok(firstRepoWithFormattedDate);
+                }
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (HttpClientErrorException e) {
+            // Maneja el error si el usuario no existe o hay otro problema con la solicitud
+            return ResponseEntity.notFound().build();
+        }
+    }
+}

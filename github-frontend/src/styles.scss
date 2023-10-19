@@ -1,0 +1,43 @@
+/* Reset de estilos para limpiar estilos por defecto */
+html, body, div, span, app-root {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  
+  /* Establecer un fondo y fuente predeterminados */
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+  }
+  
+  /* Estilos mínimos para componentes */
+  app-root {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  
+  /* Estilos para botones */
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+  
+  button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Añade más estilos según tus necesidades */
+  
+  

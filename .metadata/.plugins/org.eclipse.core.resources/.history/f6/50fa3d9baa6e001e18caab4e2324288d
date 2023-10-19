@@ -1,0 +1,43 @@
+package com.gitstart.services;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+import java.util.Date;
+
+@RestController
+@CrossOrigin(origins = "http://localhost:4200")
+public class GithubController {
+    @GetMapping("/api/github-repo")
+    public GitHubRepository searchGithubRepo(@RequestParam String username) {
+        String githubApiUrl = "https://api.github.com/users/" + username + "/repos";
+        RestTemplate restTemplate = new RestTemplate();
+
+        try {
+            GitHubRepository[] response = restTemplate.getForObject(githubApiUrl, GitHubRepository[].class);
+
+            if (response != null && response.length > 0) {
+                GitHubRepository firstRepo = response[0];
+                String repoName = firstRepo.getName();
+
+                // Obtiene la fecha de creación si está disponible
+                if (firstRepo.getCreatedAt() != null) {
+                    return firstRepo;
+                } else {
+                    // Si no se pudo obtener la fecha, devuelve el primer repositorio sin fecha
+                    firstRepo.setCreatedAt(new Date());
+                    return firstRepo;
+                }
+            } else {
+                // Si el usuario no tiene repositorios, devuelve un objeto GitHubRepository vacío
+                return new GitHubRepository();
+            }
+        } catch (HttpClientErrorException e) {
+            // Maneja el error si hay otro problema con la solicitud
+            e.printStackTrace();
+            return new GitHubRepository();
+        }
+    }
+}

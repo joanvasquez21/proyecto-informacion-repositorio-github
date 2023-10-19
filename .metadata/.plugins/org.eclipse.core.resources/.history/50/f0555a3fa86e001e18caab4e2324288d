@@ -1,0 +1,78 @@
+package com.gitstart.services;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+import java.util.Date;
+
+@RestController
+@CrossOrigin(origins = "http://localhost:4200") // Reemplaza con la URL de tu aplicación Angular
+public class GithubController {
+    @GetMapping("/api/github-repo")
+    public GitHubRepository searchGithubRepo(@RequestParam String username) {
+        // URL de la API de GitHub para buscar repositorios del usuario
+        String githubApiUrl = "https://api.github.com/users/" + username + "/repos";
+
+        // Inicializa RestTemplate
+        RestTemplate restTemplate = new RestTemplate();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        try {
+            // Realiza una solicitud GET a la API de GitHub para obtener la lista de repositorios
+            GitHubRepository[] response = restTemplate.getForObject(githubApiUrl, GitHubRepository[].class);
+
+            if (response != null && response.length > 0) {
+                GitHubRepository firstRepo = response[0];
+
+                if (firstRepo.getCreatedAt() != null) {
+                    try {
+                        // Formato de fecha actual
+                        SimpleDateFormat currentFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                        // Formato deseado
+                        SimpleDateFormat desiredFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+                        // Parsea la fecha y luego la formatea
+                        Date date = currentFormat.parse(firstRepo.getCreatedAt());
+                        String formattedDate = desiredFormat.format(date);
+
+                        firstRepo.setCreatedAt(formattedDate); // Establece la fecha formateada
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    // Si el campo createdAt es nulo, establece una fecha predeterminada o muestra "Fecha no disponible"
+                    firstRepo.setCreatedAt("Fecha no disponible");
+                }
+
+                // Obtiene el nombre del primer repositorio
+                String repoName = firstRepo.getName();
+
+                // Realiza una segunda solicitud para obtener detalles del primer repositorio
+                String repoDetailsUrl = "https://api.github.com/repos/" + username + "/" + repoName;
+                GitHubRepository detailedRepo = restTemplate.getForObject(repoDetailsUrl, GitHubRepository.class);
+
+                // Verifica si se pudo obtener la fecha de creación del repositorio
+                if (detailedRepo != null && detailedRepo.getCreatedAt() != null) {
+                    return detailedRepo;
+                } else {
+                    // Si no se pudo obtener la fecha, devuelve el primer repositorio sin fecha
+                    return firstRepo;
+                }
+            } else {
+                // Si el usuario no tiene repositorios, devuelve un objeto GitHubRepository vacío
+                return new GitHubRepository();
+            }
+        } catch (HttpClientErrorException e) {
+            // Maneja el error si el usuario no existe o hay otro problema con la solicitud
+            return new GitHubRepository();
+        }
+    }
+}

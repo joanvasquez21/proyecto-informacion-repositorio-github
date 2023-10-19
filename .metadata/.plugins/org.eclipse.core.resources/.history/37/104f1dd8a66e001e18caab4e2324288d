@@ -1,0 +1,55 @@
+package com.gitstart.services;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+@RestController
+@CrossOrigin(origins = "http://localhost:4200")
+public class GithubController {
+    @GetMapping("/api/github-repo")
+    public GitHubRepository searchGithubRepo(@RequestParam String username) {
+        String githubApiUrl = "https://api.github.com/users/" + username + "/repos";
+        RestTemplate restTemplate = new RestTemplate();
+
+        try {
+            GitHubRepository[] response = restTemplate.getForObject(githubApiUrl, GitHubRepository[].class);
+
+            if (response != null && response.length > 0) {
+                GitHubRepository firstRepo = response[0];
+                String firstRepoJson = "";
+
+                // Maneja la excepción JsonProcessingException
+                try {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    firstRepoJson = objectMapper.writeValueAsString(firstRepo);
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+
+                if (!firstRepoJson.isEmpty()) {
+                    // Realiza las operaciones con el JSON serializado (firstRepoJson)
+                }
+
+                String repoName = firstRepo.getName();
+                String repoDetailsUrl = "https://api.github.com/repos/" + username + "/" + repoName;
+                GitHubRepository detailedRepo = restTemplate.getForObject(repoDetailsUrl, GitHubRepository.class);
+
+                if (detailedRepo != null && detailedRepo.getCreatedAt() != null) {
+                    return detailedRepo;
+                } else {
+                    return firstRepo;
+                }
+            } else {
+                return new GitHubRepository();
+            }
+        } catch (HttpClientErrorException e) {
+            return new GitHubRepository();
+        }
+    }
+}

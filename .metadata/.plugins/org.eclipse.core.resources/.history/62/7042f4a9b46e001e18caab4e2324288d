@@ -1,0 +1,18 @@
+package com.gitstart.services;
+
+public class GitHubRepoResponse {
+	
+	 private String result;
+
+	    public GitHubRepoResponse(String result) {
+	        this.result = result;
+	    }
+
+	    public String getResult() {
+	        return result;
+	    }
+
+	    public void setResult(String result) {
+	        this.result = result;
+	    }
+}

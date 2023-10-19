@@ -1,0 +1,24 @@
+package com.gitstart.services;
+
+import java.util.Date;
+
+public class GitHubRepository {
+    private String name;
+    private Date createdAt; // Modificada para que sea un objeto Date
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+}

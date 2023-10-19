@@ -1,0 +1,60 @@
+<div class="flex flex-col justify-center items-center min-h-screen">
+
+  <section class="w-full min-h-screen py-12 md:py-24 lg:py-32 xl:py-48 bg-black">
+    <div class="container px-4 mx-auto md:px-6">
+      <div class="grid gap-6 items-center">
+        <div class="flex flex-col justify-center space-y-4 text-center">
+          <div class="space-y-2">
+            <h1
+              class="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-500"
+            >
+              Información sobre repositorios de usuarios
+            </h1>
+            <p
+              class="max-w-[600px] text-zinc-200 md:text-xl dark:text-zinc-100 mx-auto"
+            >
+              Buscador del primer repositorio
+            </p>
+          </div>
+          <div class="w-full max-w-sm space-y-2 mx-auto">
+            <form (ngSubmit)="search()" class="flex space-x-2">
+              <input
+                [(ngModel)]="username"
+                name="username"
+                class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 max-w-lg flex-1 bg-gray-800 text-white"
+                placeholder="Escribe tu nombre de usuario"
+                type="text"
+                required
+              />
+              <button
+                class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-primary/90 h-10 px-4 py-2 bg-white text-black"
+                type="submit"
+              >
+                Buscar
+              </button>
+            </form>
+
+            <div *ngIf="searched">
+
+
+              <div *ngIf="firstRepo !== null">
+                <div class="max-w-sm mx-auto bg-white rounded-lg shadow-lg p-4">
+                  <h2 class="text-xl font-semibold">{{ username }}</h2>
+                  <p>Primer repositorio: {{ firstRepo.name }}</p>
+                  <p>Fecha del primer repositorio: {{ firstRepo.created_at | date: 'dd/MM/yyyy' }}</p>
+                </div>
+              </div>
+              <div *ngIf="firstRepo === null && userNotFound">
+                <p
+                  class="max-w-[600px] text-zinc-200 md:text-xl dark:text-zinc-100 mx-auto"
+                >
+                  El usuario no existe
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
