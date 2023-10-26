@@ -1,5 +1,3 @@
-# proyecto-informacion-repositorio-github
-Una app web que te dice la informacion sobre tu primer repositorio, el nombre y fecha, mas adelante podemos implementar nuevos datos para la informacion.
 # GitStarts - Buscador de Repositorios en GitHub
 
 ![GitHub](https://img.shields.io/badge/GitHub-Searcher-blue)
@@ -16,5 +14,5 @@ GitStarts es una aplicación web que te permite buscar un usuario en GitHub y mo
 4. El backend selecciona el primer repositorio y su fecha de creación.
 5. La información se envía al frontend de Angular a través de una solicitud CORS.
 6. El frontend muestra el nombre del repositorio y su fecha de creación en la interfaz de usuario.
-
-## Configuración CORS
+## Imagen
+![image](https://github.com/joanvasquez21/proyecto-informacion-repositorio-github/assets/70104624/a6bb4ffa-2d16-4bc6-9606-dae71aecaa06)
